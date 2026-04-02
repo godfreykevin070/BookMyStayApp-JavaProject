@@ -1,3 +1,6 @@
+import java.util.HashMap;
+import java.util.Map;
+
 abstract class Room {
     private String roomType;
     private int numberOfBeds;
@@ -53,42 +56,94 @@ class SuiteRoom extends Room {
     }
 }
 
+/**
+ * RoomInventory class acts as a centralized inventory manager.
+ * It stores and manages room availability using a HashMap.
+ */
+class RoomInventory {
+
+    private HashMap<String, Integer> roomAvailability;
+
+    public RoomInventory() {
+        roomAvailability = new HashMap<>();
+
+        // Initial room availability
+        roomAvailability.put("Single Room", 10);
+        roomAvailability.put("Double Room", 5);
+        roomAvailability.put("Suite Room", 2);
+    }
+
+    // Retrieve availability for a room type
+    public int getAvailability(String roomType) {
+        return roomAvailability.getOrDefault(roomType, 0);
+    }
+
+    // Update room availability
+    public void updateAvailability(String roomType, int newCount) {
+        if (roomAvailability.containsKey(roomType)) {
+            roomAvailability.put(roomType, newCount);
+            System.out.println(roomType + " availability updated to " + newCount);
+        } else {
+            System.out.println("Room type not found in inventory.");
+        }
+    }
+
+    // Display complete inventory
+    public void displayInventory() {
+        System.out.println("========================================");
+        System.out.println("      CURRENT ROOM INVENTORY");
+        System.out.println("========================================");
+
+        for (Map.Entry<String, Integer> entry : roomAvailability.entrySet()) {
+            System.out.println(entry.getKey() + " -> Available Rooms: " + entry.getValue());
+        }
+
+        System.out.println("========================================");
+    }
+}
+
+
 public class BookMyStayApp {
 
     public static void main(String[] args) {
 
-        // Creating room objects using polymorphism
+        // Creating room objects
         Room singleRoom = new SingleRoom();
         Room doubleRoom = new DoubleRoom();
         Room suiteRoom = new SuiteRoom();
 
-        // Static availability variables
-        int singleRoomAvailable = 10;
-        int doubleRoomAvailable = 5;
-        int suiteRoomAvailable = 2;
+        // Initializing centralized inventory
+        RoomInventory inventory = new RoomInventory();
 
-        System.out.println("========================================");
-        System.out.println("      HOTEL ROOM AVAILABILITY");
-        System.out.println("========================================");
-
+        // Display room details
         System.out.println("\nSingle Room Details:");
         singleRoom.displayRoomDetails();
-        System.out.println("Available Rooms : " + singleRoomAvailable);
+        System.out.println("Available Rooms : " +
+                inventory.getAvailability(singleRoom.getRoomType()));
 
         System.out.println("\n----------------------------------------");
 
         System.out.println("\nDouble Room Details:");
         doubleRoom.displayRoomDetails();
-        System.out.println("Available Rooms : " + doubleRoomAvailable);
+        System.out.println("Available Rooms : " +
+                inventory.getAvailability(doubleRoom.getRoomType()));
 
         System.out.println("\n----------------------------------------");
 
         System.out.println("\nSuite Room Details:");
         suiteRoom.displayRoomDetails();
-        System.out.println("Available Rooms : " + suiteRoomAvailable);
+        System.out.println("Available Rooms : " +
+                inventory.getAvailability(suiteRoom.getRoomType()));
 
-        System.out.println("\n========================================");
-        System.out.println("Room information displayed successfully.");
-        System.out.println("========================================");
+        System.out.println("\n----------------------------------------");
+
+        // Display complete inventory
+        inventory.displayInventory();
+
+        // Example update
+        inventory.updateAvailability("Single Room", 8);
+
+        System.out.println("\nUpdated Inventory:");
+        inventory.displayInventory();
     }
 }
